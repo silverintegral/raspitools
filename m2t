@@ -1,0 +1,44 @@
+#!/usr/bin/php
+<?php
+$token = '834034144:AAHVj2gRGsj2IegHSgVZsjJ0rrOHmE3ZmWI';
+$chat = '-349544685';
+
+if (posix_isatty(STDIN)) {
+    return;
+}
+
+$mail = @file_get_contents('php://stdin');
+if (!strlen($mail))
+    return;
+
+$mail = str_replace("\r", "", $mail);
+list($head, $body) = explode("\n\n", $mail, 2);
+
+$head = "\n" . $head . "\n";
+
+preg_match('/\nFrom: (.+?)\n/m', $head, $matches);
+$from = $matches[1];
+preg_match('/\nTo: (.+?)\n/m', $head, $matches);
+$to = $matches[1];
+
+if (!$from && !$to)
+    return;
+
+$data = "From: " . $from . "\nTo: " . $to . "\n\n" . $body;
+
+$json = json_encode(array(
+    'chat_id' => $chat,
+    'disable_web_page_preview' => true,
+    'text' => $data
+));
+
+$context = array(
+    "http" => array(
+        "method"  => "POST",
+        "header"  => "Content-Type: application/json\r\n",
+        "content" => $json
+    )
+);
+
+file_get_contents('https://api.telegram.org/bot' . $token . '/sendMessage', '', stream_context_create($context));
+

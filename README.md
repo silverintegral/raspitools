@@ -12,8 +12,10 @@ Telegram連携ツール
 
 ### 使い方サンプル
 > echo aaa | telenoty
+
 もしくは
 > telenoty aaa
+
 でTelegramに文字列を送信します。
 
 IPが変更した時などに投げるようにしておくとメールを受信するよりも簡単に行えます。

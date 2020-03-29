@@ -1,15 +1,28 @@
 #!/usr/bin/php
 <?php
-$token = '834034144:AAHVj2gRGsj2IegHSgVZsjJ0rrOHmE3ZmWI';
-$chat = '-349544685';
+define('TOKEN', '');
+define('CHATID', '');
 
-if (posix_isatty(STDIN)) {
-    return;
-}
 
-$mail = @file_get_contents('php://stdin');
-if (!strlen($mail))
+if (TOKEN)
+	$token = TOKEN;
+else
+	$token = getenv('TELENOTY_TOKEN');
+
+if (CHATID)
+	$chatid = CHATID;
+else
+	$chatid = getenv('TELENOTY_CHATID');
+
+if (!$token || !$chatid)
+	return;
+
+if (posix_isatty(STDIN))
     return;
+
+if (!strlen($mail = @file_get_contents('php://stdin')))
+    return;
+
 
 $mail = str_replace("\r", "", $mail);
 list($head, $body) = explode("\n\n", $mail, 2);
@@ -24,10 +37,11 @@ $to = $matches[1];
 if (!$from && !$to)
     return;
 
+
 $data = "From: " . $from . "\nTo: " . $to . "\n\n" . $body;
 
 $json = json_encode(array(
-    'chat_id' => $chat,
+    'chat_id' => $chatid,
     'disable_web_page_preview' => true,
     'text' => $data
 ));
